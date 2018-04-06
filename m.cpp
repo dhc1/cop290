@@ -167,6 +167,7 @@ void display(){
         if(ad->edge_exists(i,i1)){
           point3D* p1 = Image_3d -> points[i];
           point3D* p2 = Image_3d -> points[i1];
+            glLineWidth(5);
             glBegin(GL_LINES);
             glColor3f(0.0, 0.0, 1.0);
             glVertex3f((p1 ->x_val)*zoom ,(p1 -> y_val)*zoom , (p1 -> z_val)*zoom    );
@@ -176,7 +177,18 @@ void display(){
 
         }
       }
-    } 
+    }
+    int** pom = facedetection(Image_3d);
+    for(int i =1;i<pom[0][0] +1;i++){
+      glLineWidth(1);
+      glColor3f(0.5,0,0);
+      glBegin(GL_POLYGON);
+      for(int i1 =1 ;i1 < pom[i][0] +1;i1++){
+        glVertex3f((Image_3d->points[pom[i][i1]] ->x_val)*zoom ,(Image_3d->points[pom[i][i1]] -> y_val)*zoom , (Image_3d->points[pom[i][i1]] -> z_val)*zoom    );
+      }
+      glEnd();
+    }
+    
   }
   glFlush();
   glutSwapBuffers();
@@ -243,7 +255,7 @@ void specialKeys( int key, int x, int y ) {
   glutPostRedisplay();
  
 }
- 
+ //bugs dekhlo yaaro
 // ----------------------------------------------------------
 // main() function
 // ----------------------------------------------------------
@@ -252,7 +264,7 @@ int main(int argc, char* argv[]){
 
 
         std::ifstream file;
-        file.open("test.txt");
+        file.open("penta.txt");
         int n;
         file>>n;
         

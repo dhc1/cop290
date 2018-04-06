@@ -41,6 +41,7 @@ public:
 
     
     bool above(point3D* p);
+    bool on_plane(point3D* p);
         
     
     static bool meet(point3D* point ,point3D* p1 ,point3D* p2 );
@@ -97,3 +98,4 @@ public:
     Structure3D* rotate_new(double x , double y , double z );
     
 };
+int** facedetection(Structure3D* Image_3d) ;

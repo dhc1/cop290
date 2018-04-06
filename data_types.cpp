@@ -1,6 +1,88 @@
 #include "data_types.h"
 #include <iostream>
 #include <math.h>
+int** facedetection(Structure3D* Image_3d){
+    ad_list* ad = Image_3d->ad;
+    int n = Image_3d -> points_num ;
+    int** pom = (int**)malloc(40*n * sizeof(int*));
+    pom[0]=(int *) malloc(sizeof(int));
+    int pom_l = 1;
+    int* po = (int *) malloc(2*n*sizeof(int));
+    int po_s =n ;
+    int po_e = n;
+    for(int i =0 ; i < n  ; i++){
+      for(int i1 = i+1; i1<n ; i1++){
+        if(ad->edge_exists(i,i1)){
+          for(int i2 = i1+1; i2 < n ; i2++){
+            if(ad->edge_exists(i1,i2) && ad->edge_exists(i,i2)){
+              pom[pom_l] = (int *) malloc(4 * sizeof(int));
+              pom[pom_l][0] = 3 ;
+              pom[pom_l][1] = i;
+              pom[pom_l][2] = i1;
+              pom[pom_l][3] = i2;
+              pom_l ++;
+
+            }
+            else if(ad->edge_exists(i1,i2) || ad->edge_exists(i,i2)){
+              po_s = n;
+              po_e = n ;
+                
+              if(!ad->edge_exists(i,i2)){
+              po[n] = i ;
+              po[n+1] = i1 ;
+              po[n+2] = i2 ;
+
+              po_e += 3;
+              }
+              else{
+                po[n] = i ;
+                po[n+1] = i1;
+                po[n-1] = i2;
+                po_s -=1;
+                po_e +=2;
+              }
+              
+              point3D** pts3 =(point3D**)malloc(3*sizeof(point3D*)); 
+              pts3[0] = Image_3d -> points[i];
+              pts3[1] = Image_3d -> points[i1];
+              pts3[2] = Image_3d -> points[i2];
+              tr_plane* pl = new tr_plane(pts3,0,3);
+              for(int i3 = i2+1 ; i3<n ; i3 ++){
+                if(pl -> on_plane(Image_3d -> points[i3])){
+                  if(ad ->edge_exists(po[po_s],i3) && ad ->edge_exists(po[po_e - 1],i3) ){
+                    po[po_e] = i3;
+                    po_e++;
+                    pom[pom_l] = (int *) malloc((po_e - po_s +1)*sizeof(int)); 
+                    pom[pom_l][0] = po_e -po_s ;
+                    for(int a =po_s; a<po_e ; a++){
+                        pom[pom_l][a -po_s + 1] = po[a];
+                        //glVertex3f((Image_3d->points[po[a]] ->x_val)*zoom ,(Image_3d->points[po[a]] -> y_val)*zoom , (Image_3d->points[po[a]] -> z_val)*zoom    ); 
+                    }
+                    pom_l++;
+
+                
+
+                    //cout << "pomark :" << po_mark<<endl;
+                  }
+                  else if(ad ->edge_exists(po[po_s],i3) ){
+                    po[po_s - 1] = i3;
+                    po_s --;
+                  }
+                  else if(ad ->edge_exists(po[po_e - 1],i3) ){
+                    po[po_e] = i3 ;
+                    po_e ++;
+                  }
+                }
+              }
+            }  
+          }
+        }
+      }
+    }
+    pom[0][0] = pom_l -1;
+    return pom ;
+
+}
 
 point2D::point2D(double m , double n , bool q){
 		x_val = m;
@@ -130,6 +212,14 @@ tr_plane::tr_plane(point3D** in_order, int  start , int end  ){
 bool tr_plane::above(point3D* p){
     double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
     if(m > 0){
+      return true ;
+    }
+    return false ;
+
+}
+bool tr_plane::on_plane(point3D* p){
+    double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
+    if(m == 0){
       return true ;
     }
     return false ;
