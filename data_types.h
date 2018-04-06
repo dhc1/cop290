@@ -11,6 +11,8 @@ public:
   double x_val,y_val,z_val;
   point3D(double m , double n , double o);
   point3D* duplicate();
+  void rotate( double x , double y , double z , double ab_x , double ab_y , double ab_z);
+  point3D* rotate_new( double x , double y , double z ,  double ab_x , double ab_y , double ab_z);
 };
 
 class ad_list{
@@ -20,7 +22,7 @@ public:
   ad_list(int m);
   bool edge_exists(int a , int b );
   void set_edge(int a , int b );
-  
+  void swap_num(int a , int b);
   
 };
 class tr_plane {
@@ -90,5 +92,8 @@ public:
     void set_ad(ad_list* a );
     
     void addpoint2D(point2D* t, point2D*f ,point2D* s);
+
+    void swap(int a , int b );
+    Structure3D* rotate_new(double x , double y , double z );
     
 };

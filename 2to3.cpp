@@ -6,4 +6,5 @@ Structure3D* generate3D(Structure2D* t ,  Structure2D* f ,Structure2D* s   ){
 	for(int i =0 ; i<t->points_num ; i++){
 		ans->addpoint2D(t->points[i],f->points[i],s->points[i]);
 	}
+	return ans;
 }

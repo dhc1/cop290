@@ -1,5 +1,6 @@
 #include "data_types.h"
 #include <iostream>
+#include <math.h>
 
 point2D::point2D(double m , double n , bool q){
 		x_val = m;
@@ -18,6 +19,36 @@ point3D::point3D(double m , double n , double o){
 point3D* point3D::duplicate(){
     point3D* dup = new point3D(x_val,y_val,z_val);
     return dup ; 
+}
+void point3D::rotate( double x , double y , double z  , double ab_x , double ab_y , double ab_z){
+    double pi = 3.1415926535897;
+    double m =  x_val - ab_x;
+    double n =  y_val - ab_y;
+    double o =  z_val - ab_z;
+
+    //about x 
+    m = m ;
+    n = n*cos((pi*x)/180) - o*sin((pi*x)/180);
+    o = n*sin((pi*x)/180) + o*cos((pi*x)/180);
+
+    // about y
+    m =o*sin((pi*y)/180) + m*cos((pi*y)/180);
+    n = n ;
+    o = o*cos((pi*y)/180) -m*sin((pi*y)/180);
+    //about z
+    m = cos((pi*z)/180)*m -n*sin((pi*z)/180);
+    n = sin((pi*z)/180)*m +n*cos((pi*z)/180);
+
+
+
+     x_val = m + ab_x;
+     y_val = n + ab_y;
+     z_val = o + ab_z;
+}
+point3D* point3D::rotate_new(  double x , double y , double z , double ab_x , double ab_y , double ab_z){
+    point3D* b = duplicate();
+    b->rotate(x,y,z, ab_x , ab_y , ab_z);
+    return b ;
 }
 
 
@@ -42,9 +73,18 @@ void ad_list::set_edge(int a , int b ){
     points[a-1][b-1]= true ;
     points[b-1][a-1]= true ;
 }
-
-
-
+void ad_list::swap_num(int a , int b){
+    bool* temp ;
+    temp = points[a];
+    points[a] = points[b];
+    points[b] = temp ;
+    bool temp1 ;
+    for(int i = 0 ; i<length ; i++){
+        temp1 = points[i][a];
+        points[i][a] = points[i][b];
+        points[i][b]= temp1;
+    }
+}
 //tr_plane class  
 double tr_plane::max(double m , double n){
   if(m >n){
@@ -103,18 +143,28 @@ bool tr_plane::meet(point3D* point ,point3D* p1 ,point3D* p2 ){
       return true ;
     }
     return false ;
+    
 
 }
 bool tr_plane::visible(point3D* point){
   bool a = true; 
   int meets = 0 ;
   for(int i =0 ; i< set_length -1 ; i++ ){
+   //   std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
       if(point->x_val <= max(set[i]->x_val,set[i+1]->x_val) && point->x_val >= min(set[i]->x_val,set[i+1]->x_val) && 
           meet(point , set[i], set[i+1] )) {
         meets ++ ;  
+     //   std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << "met here" <<std::endl;
+       // std::cout <<" x: " <<set[i+1]->x_val << " y: " << set[i+1]->y_val << std::endl;
       } 
   }
-  if(meets == 1){a = false;}
+  
+  if(point->x_val <= max(set[0]->x_val,set[set_length-1]->x_val) && point->x_val >= min(set[0]->x_val,set[set_length-1]->x_val) && 
+          meet(point , set[0], set[set_length -1] ))         meets ++ ;  
+  if(meets == 1){a = false; 
+    //std::cout << "point is inside the polygon x:"<< point->x_val <<" y:"<< point ->y_val << std::endl;
+     
+  }
   return a||above(point);
 } 
 
@@ -178,8 +228,43 @@ void Structure3D::set_ad(ad_list* a ){
   ad = a ;
 }
 void Structure3D::addpoint2D(point2D* t, point2D*f ,point2D* s){
-  point3D* a = new point3D(t->x_val , f->x_val , s -> y_val);
+  point3D* a = new point3D(t->x_val , f->x_val , s -> x_val);
   //for topview x, y are x y but for f->x_val gives y  
   points[current] = a ;
   current++ ; 
+}
+void Structure3D::swap(int a , int b ){
+  ad -> swap_num(a , b);
+  point3D* temp ;
+  temp = points[a];
+  points[a] = points[b];
+  points[b] = temp ;
+}
+Structure3D* Structure3D::rotate_new(double x , double y , double z ){
+  Structure3D* ans = new Structure3D(points_num);
+  double x_centroid=0;
+  double y_centroid=0;
+  double z_centroid=0;
+  for(int i =0 ; i< points_num;i++){
+    x_centroid += points[i]->x_val;
+    y_centroid += points[i]->y_val;
+    z_centroid += points[i]->z_val;
+  }
+  x_centroid = x_centroid/points_num;
+  y_centroid = y_centroid/points_num;
+  z_centroid = z_centroid/points_num;
+
+  point3D** ne = (point3D**) malloc(points_num * sizeof(point3D*));
+  for(int i =0 ; i< points_num ; i++){
+      ne[i] = points[i]->rotate_new(x,y,z,x_centroid,y_centroid,z_centroid);
+  }
+  ad_list* a_n = new ad_list(points_num);
+  for(int i =0 ; i<points_num ; i++){
+    for(int i1 =0 ; i1 <points_num ; i1++){
+      a_n -> points[i][i1] = ad -> points[i][i1];
+    }
+  }
+  (ans->points) = ne ;
+  (ans->ad) = a_n ;
+  return ans ;
 }
