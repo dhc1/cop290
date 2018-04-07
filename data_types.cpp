@@ -110,21 +110,33 @@ void point3D::rotate( double x , double y , double z  , double ab_x , double ab_
     double m =  x_val - ab_x;
     double n =  y_val - ab_y;
     double o =  z_val - ab_z;
+    double m1 , n1, o1 ;
 
     //about x 
-    m = m ;
-    n = n*cos((pi*x)/180) - o*sin((pi*x)/180);
-    o = n*sin((pi*x)/180) + o*cos((pi*x)/180);
+    m1 = m ;
+    n1 = n*cos((pi*x)/180) - o*sin((pi*x)/180);
+    o1 = n*sin((pi*x)/180) + o*cos((pi*x)/180);
 
+    m = m1 ;
+    n = n1 ;
+    o = o1 ;
     // about y
-    m =o*sin((pi*y)/180) + m*cos((pi*y)/180);
-    n = n ;
-    o = o*cos((pi*y)/180) -m*sin((pi*y)/180);
+    m1 =o*sin((pi*y)/180) + m*cos((pi*y)/180);
+    n1 = n ;
+    o1 = o*cos((pi*y)/180) -m*sin((pi*y)/180);
+    
+    m = m1 ;
+    n = n1 ;
+    o = o1 ;
+
     //about z
-    m = cos((pi*z)/180)*m -n*sin((pi*z)/180);
-    n = sin((pi*z)/180)*m +n*cos((pi*z)/180);
+    m1 = cos((pi*z)/180)*m -n*sin((pi*z)/180);
+    n1 = sin((pi*z)/180)*m +n*cos((pi*z)/180);
+    o1 = o ;
 
-
+    m = m1 ;
+    n = n1 ;
+    o = o1 ;
 
      x_val = m + ab_x;
      y_val = n + ab_y;
@@ -240,10 +252,10 @@ tr_plane::tr_plane(point3D** in_order, int  start , int end  ){
 bool tr_plane::above(point3D* p){
     double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
     if(m > 0){
-      std::cout << " above plane "<< std::endl;
+      //std::cout << " above plane "<< std::endl;
       return true ;
     }
-      std::cout << " below plane "<< std::endl;
+      //std::cout << " below plane "<< std::endl;
     return false ;
 
 }
@@ -271,7 +283,7 @@ bool tr_plane::visible(point3D* point){
   bool a = true; 
   int meets = 0 ;
   for(int i =0 ; i< set_length -1 ; i++ ){
-    std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
+   // std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
       if(point->x_val <= max(set[i]->x_val,set[i+1]->x_val) && point->x_val >= min(set[i]->x_val,set[i+1]->x_val) && 
           meet(point , set[i], set[i+1] )) {
         meets ++ ;
@@ -282,7 +294,8 @@ bool tr_plane::visible(point3D* point){
   }
    //std::cout <<" x: " <<set[set_length -1]->x_val << " y: " << set[set_length -1]->y_val << std::endl;
   if(point->x_val <= max(set[0]->x_val,set[set_length-1]->x_val) && point->x_val >= min(set[0]->x_val,set[set_length-1]->x_val) && 
-          meet(point , set[0], set[set_length -1] )){std::cout << "meet last"<<std::endl;         meets ++ ;}  
+          meet(point , set[0], set[set_length -1] )){//std::cout << "meet last"<<std::endl; 
+                  meets ++ ;}  
   if(meets == 1){a = false; 
     //std::cout << "point is inside the polygon x:"<< point->x_val <<" y:"<< point ->y_val << std::endl;
      
@@ -367,10 +380,10 @@ void Structure3D::swap(int a , int b ){
 }
 Structure3D* Structure3D::rotate_new(double x , double y , double z ){
   Structure3D* ans = new Structure3D(points_num);
-  double x_centroid=0;
+  /*double x_centroid=0;
   double y_centroid=0;
   double z_centroid=0;
-  /*for(int i =0 ; i< points_num;i++){
+  for(int i =0 ; i< points_num;i++){
     x_centroid += points[i]->x_val;
     y_centroid += points[i]->y_val;
     z_centroid += points[i]->z_val;
