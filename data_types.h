@@ -37,6 +37,7 @@ public:
       
     
     tr_plane(point3D** in_order, int  start , int end  );
+    tr_plane(point3D** in_order, int* po);
         
 
     

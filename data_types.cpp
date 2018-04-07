@@ -27,7 +27,7 @@ int** facedetection(Structure3D* Image_3d){
               po_s = n;
               po_e = n ;
                 
-              if(!ad->edge_exists(i,i2)){
+              if(ad->edge_exists(i1,i2)){
               po[n] = i ;
               po[n+1] = i1 ;
               po[n+2] = i2 ;
@@ -54,9 +54,12 @@ int** facedetection(Structure3D* Image_3d){
                     po_e++;
                     pom[pom_l] = (int *) malloc((po_e - po_s +1)*sizeof(int)); 
                     pom[pom_l][0] = po_e -po_s ;
-                    for(int a =po_s; a<po_e ; a++){
-                        pom[pom_l][a -po_s + 1] = po[a];
+                    for(int a =n; a<po_e ; a++){
+                        pom[pom_l][a -n + 1] = po[a];
                         //glVertex3f((Image_3d->points[po[a]] ->x_val)*zoom ,(Image_3d->points[po[a]] -> y_val)*zoom , (Image_3d->points[po[a]] -> z_val)*zoom    ); 
+                    }
+                    for(int a = po_s; a < n; a ++){
+                        pom[pom_l][(po_e - po_s) + (a - n)  + 1] = po[a];
                     }
                     pom_l++;
 
@@ -184,21 +187,46 @@ double tr_plane::min(double m , double n){
     return n ;
   }
 }
+tr_plane::tr_plane(point3D** in_order, int* po){
+    coe = (double *) malloc(4 * sizeof(double));
+    point3D* p1 = in_order[po[1]];
+    point3D* p2 = in_order[po[2]];
+    point3D* p3 = in_order[po[3]];
+    coe[0] = ((p2->y_val - p1->y_val)*(p3->z_val -p1->z_val)) - ((p3->y_val - p1->y_val)*(p2->z_val -p1->z_val)) ;
+     coe[1] = - ((p2->x_val - p1->x_val)*(p3->z_val -p1->z_val)) + ((p3->x_val - p1->x_val)*(p2->z_val -p1->z_val)) ;
+     coe[2] = ((p2->x_val - p1->x_val)*(p3->y_val -p1->y_val)) - ((p3->x_val - p1->x_val)*(p2->y_val -p1->y_val)) ;
+     coe[3] = -(p1->x_val*coe[0]) -(p1->y_val*coe[1]) -(p1->z_val*coe[2]) ;
+
+     if (coe[2]<0){
+      for(int i=0 ; i< 4;i++){
+        coe[i] = -coe[i];
+      }
+     }
+    set =(point3D **)malloc((po[0]) * sizeof(point3D *));
+    //commented
+    for(int i =1 ; i <po[0]+1 ;i++) {
+      set[i - 1] = in_order[po[i]] ;    
+    }
+    set_length = po[0] ; 
+
+
+
+}
 tr_plane::tr_plane(point3D** in_order, int  start , int end  ){
     coe = (double *) malloc(4 * sizeof(double));
     point3D* p1 = in_order[0];
     point3D* p2 = in_order[1];
     point3D* p3 = in_order[2];
     coe[0] = ((p2->y_val - p1->y_val)*(p3->z_val -p1->z_val)) - ((p3->y_val - p1->y_val)*(p2->z_val -p1->z_val)) ;
-       coe[1] = - ((p2->x_val - p1->x_val)*(p3->z_val -p1->z_val)) + ((p3->x_val - p1->x_val)*(p2->z_val -p1->z_val)) ;
-       coe[2] = ((p2->x_val - p1->x_val)*(p3->y_val -p1->y_val)) - ((p3->x_val - p1->x_val)*(p2->y_val -p1->y_val)) ;
-       coe[3] = -(p1->x_val*coe[0]) -(p1->y_val*coe[1]) -(p1->z_val*coe[2]) ;
+     coe[1] = - ((p2->x_val - p1->x_val)*(p3->z_val -p1->z_val)) + ((p3->x_val - p1->x_val)*(p2->z_val -p1->z_val)) ;
+     coe[2] = ((p2->x_val - p1->x_val)*(p3->y_val -p1->y_val)) - ((p3->x_val - p1->x_val)*(p2->y_val -p1->y_val)) ;
+     coe[3] = -(p1->x_val*coe[0]) -(p1->y_val*coe[1]) -(p1->z_val*coe[2]) ;
 
-       if (coe[2]<0){
-        for(int i=0 ; i< 4;i++){
-          coe[i] = -coe[i];
-        }
-       }
+     if (coe[2]<0){
+      for(int i=0 ; i< 4;i++){
+        coe[i] = -coe[i];
+      }
+     }
     set =(point3D **)malloc((end - start) * sizeof(point3D *));
     //commented
     for(int i =start ; i <end ;i++) {
@@ -212,8 +240,10 @@ tr_plane::tr_plane(point3D** in_order, int  start , int end  ){
 bool tr_plane::above(point3D* p){
     double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
     if(m > 0){
+      std::cout << " above plane "<< std::endl;
       return true ;
     }
+      std::cout << " below plane "<< std::endl;
     return false ;
 
 }
@@ -232,28 +262,33 @@ bool tr_plane::meet(point3D* point ,point3D* p1 ,point3D* p2 ){
     if(m <= max(p1->y_val,p2->y_val) && m >= min(p1->y_val,p2->y_val) && m > point->y_val ){
       return true ;
     }
+    if((point -> x_val == p1 -> x_val && point -> y_val <= p1 -> y_val ) || (point -> x_val == p2 -> x_val && point -> y_val <= p2 -> y_val  )) return true ;
     return false ;
     
-
+ 
 }
 bool tr_plane::visible(point3D* point){
   bool a = true; 
   int meets = 0 ;
   for(int i =0 ; i< set_length -1 ; i++ ){
-   //   std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
+    std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
       if(point->x_val <= max(set[i]->x_val,set[i+1]->x_val) && point->x_val >= min(set[i]->x_val,set[i+1]->x_val) && 
           meet(point , set[i], set[i+1] )) {
-        meets ++ ;  
-     //   std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << "met here" <<std::endl;
-       // std::cout <<" x: " <<set[i+1]->x_val << " y: " << set[i+1]->y_val << std::endl;
+        meets ++ ;
+        //std::cout << "meet between"<< std::endl;  
+       //std::cout <<"meet plane x: " <<set[i]->x_val << " y: " << set[i]->y_val << "met here" <<std::endl;
+        //std::cout <<"meet plane x: " <<set[i+1]->x_val << " y: " << set[i+1]->y_val << std::endl;
       } 
   }
-  
+   //std::cout <<" x: " <<set[set_length -1]->x_val << " y: " << set[set_length -1]->y_val << std::endl;
   if(point->x_val <= max(set[0]->x_val,set[set_length-1]->x_val) && point->x_val >= min(set[0]->x_val,set[set_length-1]->x_val) && 
-          meet(point , set[0], set[set_length -1] ))         meets ++ ;  
+          meet(point , set[0], set[set_length -1] )){std::cout << "meet last"<<std::endl;         meets ++ ;}  
   if(meets == 1){a = false; 
     //std::cout << "point is inside the polygon x:"<< point->x_val <<" y:"<< point ->y_val << std::endl;
      
+  }
+  else{
+    //std::cout << "point outside polygon " << std::endl;
   }
   return a||above(point);
 } 
@@ -335,18 +370,18 @@ Structure3D* Structure3D::rotate_new(double x , double y , double z ){
   double x_centroid=0;
   double y_centroid=0;
   double z_centroid=0;
-  for(int i =0 ; i< points_num;i++){
+  /*for(int i =0 ; i< points_num;i++){
     x_centroid += points[i]->x_val;
     y_centroid += points[i]->y_val;
     z_centroid += points[i]->z_val;
   }
   x_centroid = x_centroid/points_num;
   y_centroid = y_centroid/points_num;
-  z_centroid = z_centroid/points_num;
+  z_centroid = z_centroid/points_num;*/
 
   point3D** ne = (point3D**) malloc(points_num * sizeof(point3D*));
   for(int i =0 ; i< points_num ; i++){
-      ne[i] = points[i]->rotate_new(x,y,z,x_centroid,y_centroid,z_centroid);
+      ne[i] = points[i]->rotate_new(x,y,z,0,0,0);
   }
   ad_list* a_n = new ad_list(points_num);
   for(int i =0 ; i<points_num ; i++){

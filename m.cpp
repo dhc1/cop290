@@ -264,14 +264,14 @@ int main(int argc, char* argv[]){
 
 
         std::ifstream file;
-        file.open("penta.txt");
+        file.open("pyra_2d.txt");
         int n;
         file>>n;
         
 
         if(n==1){
         O2or3 = true;
-        int point_num;
+        
         double x_given ;
         double y_given ;
         double z_given ;
@@ -279,6 +279,7 @@ int main(int argc, char* argv[]){
         file >> y_given ;
         file >> z_given ;
         
+        int point_num;
         file >>point_num;
         
         point3D** set =(point3D**)malloc(point_num * sizeof(point3D*)) ;
