@@ -47,8 +47,10 @@ int** facedetection(Structure3D* Image_3d){
               pts3[1] = Image_3d -> points[i1];
               pts3[2] = Image_3d -> points[i2];
               tr_plane* pl = new tr_plane(pts3,0,3);
-              for(int i3 = i2+1 ; i3<n ; i3 ++){
-                if(pl -> on_plane(Image_3d -> points[i3])){
+              for(int i3 = 0 ; i3<n ; i3 ++){
+                //if(i == 0 && i1 == 1 && i2 == 2 && i3 == 3 ) std::cout <<"here" << std::endl;  
+                if(i3 != i && i3 != i1 && i3 != i2 && pl -> on_plane(Image_3d -> points[i3])){
+                  //if(i == 0 && i1 == 1 && i2 == 2 && i3 == 3 ) std::cout <<"here too " << std::endl; 
                   if(ad ->edge_exists(po[po_s],i3) && ad ->edge_exists(po[po_e - 1],i3) ){
                     po[po_e] = i3;
                     po_e++;
@@ -252,7 +254,7 @@ tr_plane::tr_plane(point3D** in_order, int  start , int end  ){
 bool tr_plane::above(point3D* p){
     double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
     if(m > 0){
-      //std::cout << " above plane "<< std::endl;
+     // std::cout << " above plane "<< std::endl;
       return true ;
     }
       //std::cout << " below plane "<< std::endl;
@@ -261,7 +263,7 @@ bool tr_plane::above(point3D* p){
 }
 bool tr_plane::on_plane(point3D* p){
     double m = coe[0]*p->x_val+coe[1]*p->y_val +coe[2]*p->z_val+coe[3];
-    if(m == 0){
+    if( -0.0001 <= m  && m <= 0.0001){
       return true ;
     }
     return false ;
@@ -283,7 +285,7 @@ bool tr_plane::visible(point3D* point){
   bool a = true; 
   int meets = 0 ;
   for(int i =0 ; i< set_length -1 ; i++ ){
-   // std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
+   //std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
       if(point->x_val <= max(set[i]->x_val,set[i+1]->x_val) && point->x_val >= min(set[i]->x_val,set[i+1]->x_val) && 
           meet(point , set[i], set[i+1] )) {
         meets ++ ;

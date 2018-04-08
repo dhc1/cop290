@@ -35,8 +35,13 @@ Structure2D*  generate2D(Structure3D* s){
     int t =0 ;
     double z;
 	 // int i = 0  ;
-    //std::cout << "points :" << p_length << std::endl;
-
+    /*std::cout << "points :" << p_length << std::endl;
+    for(int i = 1 ; i< pom[0][0] +1;i++ ){
+      for(int i1 =1 ; i1 < pom[i][0] + 1 ; i1 ++  ){
+        std::cout << pom[i][i1] ;
+      }
+      std::cout << std::endl ;
+    }*/
     
     while(t < p_length){ 
       //std::cout << "sing" << std::endl;
@@ -44,7 +49,7 @@ Structure2D*  generate2D(Structure3D* s){
       ans->addpoint3D(sorted[t],top->visible(sorted[t]));
      // i = t ;
       
-      //std::cout <<"point:"<<t << " "<<sorted[t]->x_val << " " << sorted[t]->y_val <<" "<< sorted[t] ->z_val << std::endl ;
+     // std::cout <<"point:"<<t << " "<<sorted[t]->x_val << " " << sorted[t]->y_val <<" "<< sorted[t] ->z_val << std::endl ;
       
       t++;
       while(t < p_length ){
@@ -56,11 +61,18 @@ Structure2D*  generate2D(Structure3D* s){
         //std::cout <<"point:"<<t << " "<<sorted[t]->x_val << " " << sorted[t]->y_val <<" "<< sorted[t] ->z_val << std::endl ;
         t++;
               }
+
+      //std::cout << "that number " <<pom[pom_c][0] << " " <<pom[pom_c][pom[pom_c][0]]<< std::endl ;;        
       while(pom[pom_c][pom[pom_c][0]] <= t-1  ){
         top->add_pl(new tr_plane(sorted , pom[pom_c]));
         pom_c++;
         //std::cout << "good" <<std::endl;;
         if(pom_c == (pom[0][0] +1) ) break;
+      //while(true){
+
+
+
+      //}        
 
       }
       

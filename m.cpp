@@ -1,19 +1,3 @@
-//
-// File:        mycube.c
-// Author:      Matt Daisley
-// Created:     4/25/2012
-// Project:     Source code for Make a Cube in OpenGL
-// Description: Creates an OpenGL window and draws a 3D cube
-//              That the user can rotate using the arrow keys
-// 
-// Controls:    Left Arrow  - Rotate Left
-//              Right Arrow - Rotate Right
-//              Up Arrow    - Rotate Up
-//              Down Arrow  - Rotate Down     
- 
-// ----------------------------------------------------------
-// Includes
-// ----------------------------------------------------------
 #include "data_types.h"
 #include "3to2.h"
 #include "2to3.h"
@@ -24,6 +8,7 @@
 #include<windows.h>
 #include<Gl/gl.h>
 #include<Gl/glu.h>
+//#include <plib/pu.h>
 #include<fstream>
 #define GL_GLEXT_PROTOTYPES
 #ifdef __APPLE__
@@ -59,11 +44,9 @@ Structure3D* in_3D_key;
 bool O2or3 ;
 
 Structure3D* Image_3d ;
-//ad_list* ad ;
-//ad_list* ad_n ;
-//point3D** set ;
-//int point_num ;
-//point3D** set_rot; 
+
+
+
 // ----------------------------------------------------------
 // display() Callback function
 // ----------------------------------------------------------
@@ -92,41 +75,7 @@ void display(){
         in_3D_key = in_3D_rotated -> rotate_new(x_dir , y_dir , z_dir) ;  
        // cout << x_dir << " " << y_dir << " " << z_dir << endl;
 
-       /* for(int i =0 ; i< in_3D_key ->points_num ; i++){
-          for(int i1 =0 ; i1 < in_3D_key ->points_num;i1++ ){
-          if(!in_3D_key->ad->points[i][i1]){
-            std::cout << i << " adbuth" <<i1 << endl ;
-          }
-        }
-
-
-        }*/
-
-
-        /*
-
-
-
-        //delete set_rot;
-       set_rot= (point3D**)malloc(point_num * sizeof(point3D*));
-       for(int i = 0 ; i < point_num ; i++){
-           set_rot[i] = rotate_new(set[i], x_dir , y_dir , z_dir );
-           cout << set_rot[i]->x_val << " " <<set_rot[i]->y_val << " " << set_rot[i]->z_val << endl;  
-            
-       }
-       //delete set;
-        Structure3D* i_3D = new Structure3D(point_num);
-        i_3D -> set_ad(ad);
-        i_3D -> points = set ;
-        Struture3D* i_3D_rotated = i_3D.rotate_new();*/
-
-
-
     Structure2D* Image_2d = generate2D(in_3D_key) ;
-
-    
-    //ad_list* ad = Image_2d -> ad ;
-    
     for(int i =0 ; i< Image_2d->points_num ; i++){
       //std::cout <<i << " iter " << Image_2d -> points[i]->x_val << " "<< Image_2d -> points[i]->y_val << endl ;
       for(int i1 =i+1 ; i1< Image_2d ->points_num ;i1++ ){
@@ -151,12 +100,8 @@ void display(){
 
           }
         }
-       // else{
-         // std::cout << i << " " <<i1 << endl ; 
-        //}
       }
     }
-    //cout << "end " <<endl ;
   }
   else{
    glRotatef( rotate_x, 1.0, 0.0, 0.0 );
@@ -172,7 +117,6 @@ void display(){
             glColor3f(0.0, 0.0, 1.0);
             glVertex3f((p1 ->x_val)*zoom ,(p1 -> y_val)*zoom , (p1 -> z_val)*zoom    );
             glVertex3f((p2 ->x_val)*zoom ,(p2 -> y_val)*zoom ,(p2 -> z_val)*zoom   );
-
             glEnd();
 
         }
@@ -259,12 +203,13 @@ void specialKeys( int key, int x, int y ) {
 // ----------------------------------------------------------
 // main() function
 // ----------------------------------------------------------
+
 int main(int argc, char* argv[]){
 
 
 
         std::ifstream file;
-        file.open("pyra_2d.txt");
+        file.open(argv[1]);
         int n;
         file>>n;
         
@@ -396,7 +341,7 @@ int main(int argc, char* argv[]){
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
  
   // Create window
-  glutCreateWindow("Awesome Cube");
+  glutCreateWindow("View");
  
   //  Enable Z-buffer depth test
   glEnable(GL_DEPTH_TEST);
@@ -405,6 +350,8 @@ int main(int argc, char* argv[]){
   glutDisplayFunc(display);
   glutSpecialFunc(specialKeys);
   glutKeyboardFunc(processKeys);
+
+
  
   //  Pass control to GLUT for events
   glutMainLoop();
