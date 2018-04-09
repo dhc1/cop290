@@ -10,10 +10,10 @@ int** facedetection(Structure3D* Image_3d){
     int* po = (int *) malloc(2*n*sizeof(int));
     int po_s =n ;
     int po_e = n;
-    for(int i =0 ; i < n  ; i++){
-      for(int i1 = i+1; i1<n ; i1++){
+    for(int i = 0 ; i < n   ; i++){
+      for(int i1 = i+1; i1 < n ; i1++){
         if(ad->edge_exists(i,i1)){
-          for(int i2 = i1+1; i2 < n ; i2++){
+          for(int i2 = i1 +1; i2 <n ; i2++){
             if(ad->edge_exists(i1,i2) && ad->edge_exists(i,i2)){
               pom[pom_l] = (int *) malloc(4 * sizeof(int));
               pom[pom_l][0] = 3 ;
@@ -47,10 +47,10 @@ int** facedetection(Structure3D* Image_3d){
               pts3[1] = Image_3d -> points[i1];
               pts3[2] = Image_3d -> points[i2];
               tr_plane* pl = new tr_plane(pts3,0,3);
-              for(int i3 = 0 ; i3<n ; i3 ++){
-                //if(i == 0 && i1 == 1 && i2 == 2 && i3 == 3 ) std::cout <<"here" << std::endl;  
+              for(int i3 = i2 + 1 ; i3 < n ; i3 ++){
+                //if(i == 4 && i1 == 3 && i2 == 2 && i3 == 1 ) std::cout <<"here" << std::endl;  
                 if(i3 != i && i3 != i1 && i3 != i2 && pl -> on_plane(Image_3d -> points[i3])){
-                  //if(i == 0 && i1 == 1 && i2 == 2 && i3 == 3 ) std::cout <<"here too " << std::endl; 
+                  //if(i == 4 && i1 == 3 && i2 == 2 && i3 == 1 ) std::cout <<"here too " << std::endl; 
                   if(ad ->edge_exists(po[po_s],i3) && ad ->edge_exists(po[po_e - 1],i3) ){
                     po[po_e] = i3;
                     po_e++;
@@ -271,7 +271,7 @@ bool tr_plane::on_plane(point3D* p){
 }
 bool tr_plane::meet(point3D* point ,point3D* p1 ,point3D* p2 ){
     double  m = (p2->y_val -p1->y_val)/(p2->x_val - p1->x_val); 
-    m = (point->x_val -p2->x_val)*m ;
+    m = (point->x_val -p2->x_val)*m ; //slope equal to infinite case 
     m = m + p2->y_val ;
     if(m <= max(p1->y_val,p2->y_val) && m >= min(p1->y_val,p2->y_val) && m > point->y_val ){
       return true ;
@@ -285,37 +285,27 @@ bool tr_plane::visible(point3D* point){
   bool a = true; 
   int meets = 0 ;
   for(int i =0 ; i< set_length -1 ; i++ ){
-   //std::cout <<" x: " <<set[i]->x_val << " y: " << set[i]->y_val << std::endl;
       if(point->x_val <= max(set[i]->x_val,set[i+1]->x_val) && point->x_val >= min(set[i]->x_val,set[i+1]->x_val) && 
           meet(point , set[i], set[i+1] )) {
         meets ++ ;
-        //std::cout << "meet between"<< std::endl;  
-       //std::cout <<"meet plane x: " <<set[i]->x_val << " y: " << set[i]->y_val << "met here" <<std::endl;
-        //std::cout <<"meet plane x: " <<set[i+1]->x_val << " y: " << set[i+1]->y_val << std::endl;
       } 
   }
-   //std::cout <<" x: " <<set[set_length -1]->x_val << " y: " << set[set_length -1]->y_val << std::endl;
   if(point->x_val <= max(set[0]->x_val,set[set_length-1]->x_val) && point->x_val >= min(set[0]->x_val,set[set_length-1]->x_val) && 
           meet(point , set[0], set[set_length -1] )){//std::cout << "meet last"<<std::endl; 
                   meets ++ ;}  
   if(meets == 1){a = false; 
-    //std::cout << "point is inside the polygon x:"<< point->x_val <<" y:"<< point ->y_val << std::endl;
      
   }
-  else{
-    //std::cout << "point outside polygon " << std::endl;
-  }
-  return a||above(point);
+
+  return a||above(point)|| on_plane(point);
 } 
 
 
 
-//array class
 array::array(int m){
 	i=0 ;
 	j =(tr_plane **)malloc(m * sizeof(tr_plane *));
 	j_length = m ;
-//commented
 }
 void array::add_pl(tr_plane* m){
 	j[i] = m ;
@@ -341,10 +331,9 @@ bool array::visible(point3D* point){
 }
 
 
-//structure2D class
 Structure2D::Structure2D(int a){
   points = (point2D**) malloc (a * sizeof(point2D *) );
-  //ad= new ad_list(a);
+  visi= new ad_list(a);
   points_num = a;
   current = 0 ;
 }
@@ -358,7 +347,6 @@ void Structure2D::addpoint3D(point3D* m, bool visi){
 }
 
 
-//Structure3D class
 Structure3D::Structure3D(int a){
   points = (point3D**) malloc (a * sizeof(point3D *) );
   points_num = a;
@@ -369,7 +357,6 @@ void Structure3D::set_ad(ad_list* a ){
 }
 void Structure3D::addpoint2D(point2D* t, point2D*f ,point2D* s){
   point3D* a = new point3D(t->x_val , f->x_val , s -> x_val);
-  //for topview x, y are x y but for f->x_val gives y  
   points[current] = a ;
   current++ ; 
 }
@@ -382,17 +369,6 @@ void Structure3D::swap(int a , int b ){
 }
 Structure3D* Structure3D::rotate_new(double x , double y , double z ){
   Structure3D* ans = new Structure3D(points_num);
-  /*double x_centroid=0;
-  double y_centroid=0;
-  double z_centroid=0;
-  for(int i =0 ; i< points_num;i++){
-    x_centroid += points[i]->x_val;
-    y_centroid += points[i]->y_val;
-    z_centroid += points[i]->z_val;
-  }
-  x_centroid = x_centroid/points_num;
-  y_centroid = y_centroid/points_num;
-  z_centroid = z_centroid/points_num;*/
 
   point3D** ne = (point3D**) malloc(points_num * sizeof(point3D*));
   for(int i =0 ; i< points_num ; i++){

@@ -4,6 +4,7 @@
 
 double pi = 3.1415926535897;
 
+
 void sort_by_z(Structure3D* s){
   int i, j;
   bool swap;
@@ -11,11 +12,8 @@ void sort_by_z(Structure3D* s){
         swap = false ;       
        for (j = 0; j < s->points_num-i-1; j++){ 
            if (s->points[j]->z_val < s->points[j+1]->z_val){
-               //std::cout << "true" <<s->points[j]->z_val << std::endl;
-               //std::cout << "true" <<s->points[j+1]->z_val << std::endl;
                s ->swap(j, j+ 1);
                swap = true;
-               //std::cout << "true";
                
            }
        }
@@ -34,54 +32,42 @@ Structure2D*  generate2D(Structure3D* s){
     ans->set_ad(a);
     int t =0 ;
     double z;
-	 // int i = 0  ;
-    /*std::cout << "points :" << p_length << std::endl;
-    for(int i = 1 ; i< pom[0][0] +1;i++ ){
-      for(int i1 =1 ; i1 < pom[i][0] + 1 ; i1 ++  ){
-        std::cout << pom[i][i1] ;
-      }
-      std::cout << std::endl ;
-    }*/
+	  int q = 0  ;
     
     while(t < p_length){ 
-      //std::cout << "sing" << std::endl;
       z = sorted[t]->z_val ;
-      ans->addpoint3D(sorted[t],top->visible(sorted[t]));
-     // i = t ;
+      ans->addpoint3D(sorted[t],true);
+      q = t ;
       
-     // std::cout <<"point:"<<t << " "<<sorted[t]->x_val << " " << sorted[t]->y_val <<" "<< sorted[t] ->z_val << std::endl ;
       
       t++;
       while(t < p_length ){
         if(z != sorted[t]->z_val ){
           break ;
         }    
-        //std::cout << "loop1" << std::endl;
-        ans->addpoint3D(sorted[t],top->visible(sorted[t]));
-        //std::cout <<"point:"<<t << " "<<sorted[t]->x_val << " " << sorted[t]->y_val <<" "<< sorted[t] ->z_val << std::endl ;
+        ans->addpoint3D(sorted[t],true);
         t++;
               }
 
-      //std::cout << "that number " <<pom[pom_c][0] << " " <<pom[pom_c][pom[pom_c][0]]<< std::endl ;;        
-      while(pom[pom_c][pom[pom_c][0]] <= t-1  ){
+      while(pom_c <= pom[0][0] &&  pom[pom_c][1] <= t  ){
+        for(int i = 1; i < pom[pom_c][0] + 1 ; i++){
+        }  
+
         top->add_pl(new tr_plane(sorted , pom[pom_c]));
         pom_c++;
-        //std::cout << "good" <<std::endl;;
-        if(pom_c == (pom[0][0] +1) ) break;
-      //while(true){
-
-
-
-      //}        
+        if(pom_c == (pom[0][0]+1) ) break;
 
       }
-      
-      //top->add_pl(new tr_plane(sorted ,i, t ));
-      /*std::cout << top -> i <<" array_length"<<std::endl;
-      std::cout << top -> j[0] -> coe[0]<<std::endl;
-      std::cout << top -> j[0] -> coe[1]<<std::endl;
-      std::cout << top -> j[0] -> coe[2]<<std::endl;
-      std::cout << top -> j[0] -> coe[3]<<std::endl;*/
+      for(int i1 = q ; i1 < t ; i1++ ){
+        for(int i2 = 0 ; i2 < t ; i2++){
+            if(i1 != i2 && s -> ad -> edge_exists(i1 , i2))  {
+               point3D* p = new point3D((sorted[i1]->x_val + sorted[i2]->x_val)/2 ,(sorted[i1]->y_val + sorted[i2]->y_val)/2 ,(sorted[i1]->z_val + sorted[i2]->z_val)/2   );
+               if(top -> visible(p)){
+                    (ans-> visi)->set_edge(i1+1,i2+1) ;
+            }
+          }
+        }
+      }
     }
     return ans ;
 }

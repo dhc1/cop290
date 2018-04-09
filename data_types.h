@@ -74,6 +74,7 @@ public:
     point2D** points ;
     int points_num ;
     ad_list* ad ;
+    ad_list* visi;
     int current ;
     Structure2D(int a);
      
@@ -88,6 +89,7 @@ public:
     point3D** points ;
     int points_num ;
     ad_list* ad ;
+
     int current ;
     Structure3D(int a);
     
